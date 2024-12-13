@@ -7,6 +7,7 @@ import { NextIntlClientProvider } from 'next-intl';
 import { getMessages } from 'next-intl/server';
 import { routing } from '@/i18n/routing';
 import { notFound } from 'next/navigation';
+import QueryProvider from '../../../lib/tanstackProvider';
 
 
 const dos = localFont({
@@ -39,7 +40,9 @@ export default async function RootLayout({
       <body className={`${dos.variable}`}>
         <NextIntlClientProvider messages={messages}>
           <SeasonProvider>
-            {children}
+            <QueryProvider >
+              {children}
+            </QueryProvider>
           </SeasonProvider>
         </NextIntlClientProvider>
       </body>

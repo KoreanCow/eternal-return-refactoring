@@ -3,7 +3,7 @@ import styles from './nickname.module.scss'
 
 import { useRouter } from 'next/navigation';
 import { UserNum } from '@/types/user/info';
-import { useFetchData } from '../../../../../hooks/useDataFetching';
+
 import { useSeason } from '@/app/[locale]/(home)/components/context/SeasonContext';
 
 import UserInfo from '../components/UserInfo';
@@ -11,10 +11,12 @@ import UserStat from '../components/UserStat';
 import { useEffect, useRef, useState } from 'react';
 import UserMatchResult from '../components/UserMatchResult';
 import { useTranslations } from 'next-intl';
+import { useQuery } from '@tanstack/react-query';
+import instance from '../../../../../lib/axios';
 
 export default function UserPage({ params }: { params: { nickname: string } }) {
   const t = useTranslations('UserPage');
-  const { season } = useSeason();
+  // const { season } = useSeason();
   const [toggleOpen, setToggleOpen] = useState<boolean>(false);
 
   const router = useRouter();
@@ -41,10 +43,15 @@ export default function UserPage({ params }: { params: { nickname: string } }) {
     }
   }, [toggleOpen])
 
-  const { data: userNum, loading, error } = useFetchData<UserNum>(
-    `v1/user/nickname?query=${decodedNickname}`,
-    'userNum',
-  )
+  const { data: userNum, isLoading } = useQuery<UserNum>({
+    queryKey: ['userNum', decodedNickname],
+    queryFn: async () => (await instance.get(`/v1/user/nickname?query=${decodedNickname}`)).data,
+  })
+
+  if (isLoading) {
+    return <p>Loading...</p>;
+  }
+  console.log(userNum);
   return (
     <div className={styles.body}>
       <div className={styles.toggle}>
@@ -53,9 +60,9 @@ export default function UserPage({ params }: { params: { nickname: string } }) {
 
       </div>
 
-      <UserInfo userNum={userNum} loading={loading} error={error} />
-      <UserStat userNum={userNum} seasonID={season?.seasonID ?? null} />
-      <UserMatchResult userNum={userNum} ref={toggleRef} isOpen={toggleOpen} onClose={() => setToggleOpen(false)} />
+      <UserInfo userNum={userNum!} />
+      <UserStat userNum={userNum!} seasonID={29} />
+      <UserMatchResult userNum={userNum!} ref={toggleRef} isOpen={toggleOpen} onClose={() => setToggleOpen(false)} />
     </div>
   );
 }

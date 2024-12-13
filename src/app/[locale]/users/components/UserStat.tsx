@@ -1,11 +1,12 @@
 import styles from '../[nickname]/nickname.module.scss'
 
 import { UserNum } from '@/types/user/info';
-import { useFetchData } from '../../../../../hooks/useDataFetching';
 import { UserStats } from '@/types/user/stat';
 import { userTier } from '../../../../../utils/userTier';
 import CharacterStat from './CharacterStat';
 import { useTranslations } from 'next-intl';
+import { useQuery } from '@tanstack/react-query';
+import instance from '../../../../../lib/axios';
 
 interface UserStatProps {
   userNum: UserNum | null;
@@ -14,12 +15,11 @@ interface UserStatProps {
 
 export default function UserStat({ userNum, seasonID }: UserStatProps) {
   const t = useTranslations('UserPage');
-  const fetchPath = userNum && seasonID ? `v1/user/stats/${userNum.user.userNum}/${seasonID}` : '';
 
-  const { data: userStat, loading, error } = useFetchData<UserStats>(
-    fetchPath,
-    'userStat'
-  )
+  const { data: userStat, isLoading, error } = useQuery<UserStats>({
+    queryKey: ['userStat'],
+    queryFn: async () => (await instance.get(`/v1/user/stats/${userNum?.user.userNum}/${seasonID}`)).data
+  })
   const stats = userStat?.userStats[0];
   const { tier, grade, rp } = userTier(stats?.mmr || 0, stats?.rank || 0);
 
@@ -37,13 +37,12 @@ export default function UserStat({ userNum, seasonID }: UserStatProps) {
     { label: t('AverageAssistants'), value: stats?.averageAssistants },
 
   ];
-  if (loading) return <p>Loading User Info...</p>;
-  if (error) return <p>Error: {error}</p>;
 
-  if (!userStat) {
-    return <p>No user data available.</p>
+  if (isLoading) {
+    return <span> Loading ...</span>
   }
-  // 
+  if (error) return <p>Error: {error.message}</p>;
+
   return (
     <div className={styles.stat}>
       <h1 className={styles.summary}>{t('UserAverage')}</h1>
