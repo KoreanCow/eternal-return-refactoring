@@ -13,10 +13,10 @@ export default function Rank() {
 
   const { season } = useSeason();
   const { data: ranking, isLoading, error } = useQuery<RankListType>({
-    queryKey: ['ranking'],
-    queryFn: async () => (await instance.get('/v1/rank/top/29/3')).data,
+    queryKey: ['ranking', season?.seasonID],
+    queryFn: async () => (await instance.get(`v1/rank/top/${season?.seasonID}/3`)).data,
+    enabled: !!season?.seasonID, // seasonID가 있을 때만 활성화
   });
-
   if (isLoading) {
     return <p>Loading...</p>;
   }
