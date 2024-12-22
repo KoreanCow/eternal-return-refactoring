@@ -16,7 +16,7 @@ import instance from '../../../../../lib/axios';
 
 export default function UserPage({ params }: { params: { nickname: string } }) {
   const t = useTranslations('UserPage');
-  // const { season } = useSeason();
+  const { season } = useSeason();
   const [toggleOpen, setToggleOpen] = useState<boolean>(false);
 
   const router = useRouter();
@@ -51,7 +51,7 @@ export default function UserPage({ params }: { params: { nickname: string } }) {
   if (isLoading) {
     return <p>Loading...</p>;
   }
-  console.log(userNum);
+  console.log(season?.seasonID);
   return (
     <div className={styles.body}>
       <div className={styles.toggle}>
@@ -61,7 +61,7 @@ export default function UserPage({ params }: { params: { nickname: string } }) {
       </div>
 
       <UserInfo userNum={userNum!} />
-      <UserStat userNum={userNum!} seasonID={29} />
+      <UserStat userNum={userNum!} seasonID={season!.seasonID} />
       <UserMatchResult userNum={userNum!} ref={toggleRef} isOpen={toggleOpen} onClose={() => setToggleOpen(false)} />
     </div>
   );

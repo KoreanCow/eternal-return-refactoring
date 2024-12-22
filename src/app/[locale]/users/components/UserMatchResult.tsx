@@ -1,9 +1,10 @@
 import { forwardRef, useEffect, useRef, useState } from 'react';
 import styles from '../[nickname]/nickname.module.scss';
 import { UserNum } from '@/types/user/info';
-import { useFetchData } from '../../../../../hooks/useDataFetching';
 import { MatchType } from '@/types/user/match';
 import MatchDetail from './MatchDetail';
+import instance from '../../../../../lib/axios';
+import { useInfiniteQuery, useQuery } from '@tanstack/react-query';
 
 interface UserMatchResultProps {
   userNum: UserNum | null;
@@ -18,18 +19,34 @@ const UserMatchResult = forwardRef<HTMLDivElement, UserMatchResultProps>(
       next: null,
     });
 
-    const { data: result, loading, error } = useFetchData<MatchType>(
-      userNum && !cachedResult.userGames.length
-        ? `v1/user/games/${userNum.user.userNum}`
-        : null,
-      'matchResult'
-    );
+    // const { data: result, isLoading, error, fetchNextPage, hasNextPage } = useInfiniteQuery<MatchType> ({
+    //   queryKey: ['matchResult', userNum?.user.userNum],
+    //   queryFn: async ({ pageParam = null }) => {
+    //     const response  = await instance.get(`/v1/user/games/${userNum?.user.userNum}`,
+    //       { params: { next: pageParam} }
+    //     );
+    //     return response.data
+    //   },
+    //   getNextPageParam: (lastPage) => lastPage.next,
+    //   enabled: !!userNum?.user.userNum
+    // })
+    const { data: result, isLoading, error } = useQuery<MatchType>({
+      queryKey: ['matchResult', userNum?.user.userNum],
+      queryFn: async () => {
+        const response = await instance.get(`/v1/user/games/${userNum?.user.userNum}`
+        )
+        return response.data;
+      },
+      enabled: !!userNum?.user.userNum,
 
+    })
     useEffect(() => {
-      if (result && !cachedResult.userGames.length) {
+      if (result) {
         setCachedResult(result);
       }
-    }, [result]);
+    }, [result])
+    console.log(userNum?.user.userNum)
+    console.log(result)
 
     const loadMoreGames = async () => {
       if (cachedResult.next) {
@@ -82,14 +99,19 @@ const UserMatchResult = forwardRef<HTMLDivElement, UserMatchResultProps>(
       };
     }, [cachedResult.next]);
 
+    if (isLoading) {
+      <p>Loading ...</p>
+    }
+
+    if (error) {
+      return <p> {error.message}</p>
+    }
     return (
       <div ref={ref} className={`${styles.sidebar} ${isOpen ? styles.open : ''}`}>
         <button className={styles.closeBtn} onClick={onClose}>
           Close
         </button>
         <h2>Match Results</h2>
-        {loading && <p>Loading...</p>}
-        {error && <p>Error loading match results: {error}</p>}
         <div>
           {cachedResult.userGames.map((game, index) => (
             <MatchDetail key={index} game={game} />
