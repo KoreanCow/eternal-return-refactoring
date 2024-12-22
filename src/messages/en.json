@@ -28,7 +28,8 @@
     "CharacterCode": "Character Code",
     "Usages": "Usages",
     "MaxKillings": "Max Killings",
-    "CharacterWins": "Wins"
+    "CharacterWins": "Wins",
+    "NoStatsAvailable" : "No Stats Available"
   },
   "MatchResult" : {
     "GameID": "GameID",

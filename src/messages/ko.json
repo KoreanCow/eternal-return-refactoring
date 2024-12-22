@@ -28,7 +28,8 @@
     "CharacterCode": "실험체 코드",
     "Usages": "게임 수",
     "MaxKillings": "최대 킬",
-    "CharacterWins": "승리 횟수"
+    "CharacterWins": "승리 횟수",
+    "NoStatsAvailable": "이번 시즌 전적이 없습니다."
   },
   "MatchResult" : {
     "GameID": "게임ID",

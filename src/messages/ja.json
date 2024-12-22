@@ -27,7 +27,8 @@
     "CharacterCode": "実験体コード",
     "Usages": "プレイ数",
     "MaxKillings": "最大キル",
-    "CharacterWins": "勝利回数"
+    "CharacterWins": "勝利回数",
+    "NoStatsAvailable": "このシーズンのプレイデータはありません。"
   },
   "MatchResult" : {
     "GameID": "ゲームID",

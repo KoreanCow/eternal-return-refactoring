@@ -23,6 +23,7 @@ export default function UserStat({ userNum, seasonID }: UserStatProps) {
   const stats = userStat?.userStats[0];
   const { tier, grade, rp } = userTier(stats?.mmr || 0, stats?.rank || 0);
 
+  console.log(stats)
   const statValues = [
     {
       label: t('Tier'), value: stats ? (<>{`${tier} ${grade} ${rp}RP`}<br />{`${stats.rank}th (${((stats.rank / stats.rankSize) * 100).toFixed(2)}%)`}</>) : "Can't Find Tiers"
@@ -47,15 +48,21 @@ export default function UserStat({ userNum, seasonID }: UserStatProps) {
     <div className={styles.stat}>
       <h1 className={styles.summary}>{t('UserAverage')}</h1>
       <div className={styles.average}>
-        {statValues.map((stat, index) => (
-          <div key={index} className={styles.statItem}>
-            <p>{stat.label}</p>
-            <span>{stat.value}</span>
-          </div>
-        ))}
+        {stats ? (
+          <>
+            {statValues.map((stat, index) => (
+              <div key={index} className={styles.statItem}>
+                <p>{stat.label}</p>
+                <span>{stat.value}</span>
+              </div>
+            ))}
+            <h1 className={styles.summary}>{t('CharacterStat')}</h1>
+            <CharacterStat characterStat={stats!.characterStats} />
+          </>
+        ) : (
+          <p>{t('NoStatsAvailable')}</p>
+        )}
       </div>
-      <h1 className={styles.summary}>{t('CharacterStat')}</h1>
-      <CharacterStat characterStat={stats!.characterStats} />
     </div>
   )
 }
